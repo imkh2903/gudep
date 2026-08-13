@@ -1,0 +1,52 @@
+{
+  "users": [
+    {"id":1, "nama_lengkap":"Super Admin", "email":"admin@gudep.local", "role":"SUPER_ADMIN", "password":"admin"},
+    {"id":2, "nama_lengkap":"Pembina Putra", "email":"pembina@gudep.local", "role":"PEMBINA", "password":"pembina"},
+    {"id":3, "nama_lengkap":"Kerani Putra", "email":"kerani@gudep.local", "role":"KERANI", "password":"kerani"}
+  ],
+  "periode": [
+    {"id":1, "nama_periode":"2024/2025", "tahun_mulai":2024, "tahun_selesai":2025, "is_active":false},
+    {"id":2, "nama_periode":"2025/2026", "tahun_mulai":2025, "tahun_selesai":2026, "is_active":true}
+  ],
+  "jabatan": [
+    {"id":1, "nama_jabatan":"KaMabigus", "kategori":"MABIGUS", "urutan":1},
+    {"id":2, "nama_jabatan":"Pembina Putra", "kategori":"PEMBINA", "urutan":2},
+    {"id":3, "nama_jabatan":"Pembina Putri", "kategori":"PEMBINA", "urutan":3},
+    {"id":4, "nama_jabatan":"Pradana Putra", "kategori":"AMBALAN_PUTRA", "urutan":4},
+    {"id":5, "nama_jabatan":"Pradana Putri", "kategori":"AMBALAN_PUTRI", "urutan":5},
+    {"id":6, "nama_jabatan":"Kerani Putra", "kategori":"AMBALAN_PUTRA", "urutan":6},
+    {"id":7, "nama_jabatan":"Kerani Putri", "kategori":"AMBALAN_PUTRI", "urutan":7},
+    {"id":8, "nama_jabatan":"Juru Uang", "kategori":"SEKSI_BIDANG", "urutan":8},
+    {"id":9, "nama_jabatan":"Pemangku Adat", "kategori":"SEKSI_BIDANG", "urutan":9},
+    {"id":10, "nama_jabatan":"Koordinator Tekpram", "kategori":"SEKSI_BIDANG", "urutan":10},
+    {"id":11, "nama_jabatan":"Koordinator Giatopp", "kategori":"SEKSI_BIDANG", "urutan":11},
+    {"id":12, "nama_jabatan":"Koordinator Abdimas", "kategori":"SEKSI_BIDANG", "urutan":12},
+    {"id":13, "nama_jabatan":"Koordinator Evabang", "kategori":"SEKSI_BIDANG", "urutan":13}
+  ],
+  "pengurus": [
+    {"id":1, "periode_id":2, "jabatan_id":1, "nama_lengkap":"Amrizon, S.Pd., M.Pd.I.", "nip_or_nisn":"19850101", "gudep":"03-003/03-004", "ambalan":"SEMUA", "tingkatan":"PEMBINA", "bidang":"NON_BIDANG", "foto_url":"", "status_aktif":true},
+    {"id":2, "periode_id":2, "jabatan_id":2, "nama_lengkap":"Fajrio, M.Pd.", "nip_or_nisn":"19900215", "gudep":"03-003", "ambalan":"AHMAD_KHATIB", "tingkatan":"PEMBINA", "bidang":"NON_BIDANG", "foto_url":"", "status_aktif":true},
+    {"id":3, "periode_id":2, "jabatan_id":3, "nama_lengkap":"Irdawati, S.H.I.", "nip_or_nisn":"19880920", "gudep":"03-004", "ambalan":"HR_RASUNA_SAID", "tingkatan":"PEMBINA", "bidang":"NON_BIDANG", "foto_url":"", "status_aktif":true},
+    {"id":4, "periode_id":2, "jabatan_id":4, "nama_lengkap":"Fadli Devandri", "nip_or_nisn":"1234567890", "gudep":"03-003", "ambalan":"AHMAD_KHATIB", "tingkatan":"LAKSANA", "bidang":"NON_BIDANG", "foto_url":"", "status_aktif":true},
+    {"id":5, "periode_id":2, "jabatan_id":6, "nama_lengkap":"Muhammad Daffa Pratama", "nip_or_nisn":"1234567891", "gudep":"03-003", "ambalan":"AHMAD_KHATIB", "tingkatan":"LAKSANA", "bidang":"NON_BIDANG", "foto_url":"", "status_aktif":true},
+    {"id":6, "periode_id":1, "jabatan_id":1, "nama_lengkap":"Amrizon, S.Pd., M.Pd.I.", "nip_or_nisn":"19850101", "gudep":"03-003/03-004", "ambalan":"SEMUA", "tingkatan":"PEMBINA", "bidang":"NON_BIDANG", "foto_url":"", "status_aktif":false},
+    {"id":7, "periode_id":1, "jabatan_id":2, "nama_lengkap":"Abd. Malik, S.Hum.", "nip_or_nisn":"19751220", "gudep":"03-003", "ambalan":"AHMAD_KHATIB", "tingkatan":"PEMBINA", "bidang":"NON_BIDANG", "foto_url":"", "status_aktif":false},
+    {"id":8, "periode_id":1, "jabatan_id":3, "nama_lengkap":"Mukhti Ayuni, S.Pd.", "nip_or_nisn":"19921015", "gudep":"03-004", "ambalan":"HR_RASUNA_SAID", "tingkatan":"PEMBINA", "bidang":"NON_BIDANG", "foto_url":"", "status_aktif":false},
+    {"id":9, "periode_id":1, "jabatan_id":4, "nama_lengkap":"Rangga Asri Pratama", "nip_or_nisn":"1098765432", "gudep":"03-003", "ambalan":"AHMAD_KHATIB", "tingkatan":"LAKSANA", "bidang":"NON_BIDANG", "foto_url":"", "status_aktif":false},
+    {"id":10, "periode_id":1, "jabatan_id":6, "nama_lengkap":"Ardi Fathir Rahman", "nip_or_nisn":"1098765433", "gudep":"03-003", "ambalan":"AHMAD_KHATIB", "tingkatan":"BANTARA", "bidang":"NON_BIDANG", "foto_url":"", "status_aktif":false}
+  ],
+  "dokumen_surat": [
+    {"id":1, "nomor_surat":"163GP/030503-MAN1PADPAR/2026", "judul_dokumen":"Proposal GALAKSI IV", "kategori":"PROPOSAL", "tanggal_dokumen":"2026-03-15", "tanggal_kegiatan":"2026-04-10", "file_url":"#", "deskripsi":"Proposal kegiatan GALAKSI IV", "is_public":true, "uploaded_by":1, "created_at":"2026-01-10"}
+  ],
+  "kegiatan_agenda": [
+    {"id":1, "nama_kegiatan":"Latihan Wajib Sabtu", "jenis_kegiatan":"LATIHAN_WAJIB", "tanggal_mulai":"2026-08-15T07:00:00", "tanggal_selesai":"2026-08-15T10:00:00", "lokasi":"MAN 1 Padang Pariaman", "anggaran_biaya":0, "status":"RENCANA", "deskripsi":"Latihan rutin setiap sabtu"},
+    {"id":2, "nama_kegiatan":"Pelantikan Penegak Bantara & Laksana", "jenis_kegiatan":"PELANTIKAN", "tanggal_mulai":"2026-08-20T08:00:00", "tanggal_selesai":"2026-08-20T12:00:00", "lokasi":"Aula MAN 1 Padang Pariaman", "anggaran_biaya":5000000, "status":"RENCANA", "deskripsi":"Pelantikan tingkatan"},
+    {"id":3, "nama_kegiatan":"Persami", "jenis_kegiatan":"PERKEMAHAN", "tanggal_mulai":"2026-09-01T06:00:00", "tanggal_selesai":"2026-09-03T14:00:00", "lokasi":"Fadhillah Camp", "anggaran_biaya":15000000, "status":"RENCANA", "deskripsi":"Perkemahan Sabtu Minggu"},
+    {"id":4, "nama_kegiatan":"Kemah Wajib", "jenis_kegiatan":"PERKEMAHAN", "tanggal_mulai":"2026-10-10T06:00:00", "tanggal_selesai":"2026-10-12T14:00:00", "lokasi":"Bumi Perkemahan", "anggaran_biaya":25000000, "status":"RENCANA", "deskripsi":"Kemah Wajib tahunan"}
+  ],
+  "anggota": [
+    {"id":1, "nama":"Ahmad Fauzi", "nisn":"0023456789", "gudep":"03-003", "ambalan":"AHMAD_KHATIB", "tingkatan":"BANTARA", "status":true},
+    {"id":2, "nama":"Putri Andini", "nisn":"0023456790", "gudep":"03-004", "ambalan":"HR_RASUNA_SAID", "tingkatan":"LAKSANA", "status":true},
+    {"id":3, "nama":"Bayu Pratama", "nisn":"0023456791", "gudep":"03-003", "ambalan":"AHMAD_KHATIB", "tingkatan":"TAMU", "status":true}
+  ]
+}

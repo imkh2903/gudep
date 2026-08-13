@@ -1,0 +1,1153 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Portal — Gudep 03-003/03-004 MAN 1 Padang Pariaman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><rect width='100%25' height='100%25' fill='%2310b981'/><text x='50%25' y='50%25' font-size='10' dominant-baseline='middle' text-anchor='middle' fill='white'>G</text></svg>">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','sans-serif'] },
+          colors: {
+            pramuka: {50:'#ecfdf5',100:'#d1fae5',500:'#10b981',600:'#059669',700:'#047857',800:'#065f46',900:'#064e3b' },
+            brand: { 50:'#f0fdf4',500:'#22c55e',600:'#16a34a',900:'#14532d' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); }
+    .fade-in { animation: fadeIn .25s ease-out; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(6px);} to { opacity:1; transform: translateY(0);} }
+    [x-cloak] { display: none !important; }
+    .sidebar-link.active { background:#ecfdf5; color:#064e3b; border-right: 3px solid #059669; }
+    .hidden-page { display: none !important; }
+ /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+ <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-[url('https://images.unsplash.com/photo-1596324612724-9ed60792f548?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center relative">
+    <div class="absolute inset-0 bg-slate-900/70"></div>
+    <div class="relative z-10 bg-white/95 backdrop-blur rounded-2xl shadow-2xl w-full max-w-md overflow-hidden fade-in border border-white/50">
+      <div class="bg-gradient-to-r from-pramuka-700 to-pramuka-600 p-6 text-white text-center">
+        <h1 class="text-2xl font-bold tracking-tight">Admin Portal Gudep</h1>
+        <p class="text-pramuka-100 text-sm mt-1">03-003 / 03-004 — MAN 1 Padang Pariaman</p>
+      </div>
+      <div class="p-8 space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+          <input id="login-email" type="email" class="w-full rounded-lg border-slate-200 focus:border-pramuka-600 focus:ring-pramuka-600 px-4 py-2.5 text-sm" placeholder="admin@gudep.local">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Kata Sandi</label>
+          <input id="login-password" type="password" class="w-full rounded-lg border-slate-200 focus:border-pramuka-600 focus:ring-pramuka-600 px-4 py-2.5 text-sm">
+ </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Demo Peran (opsional)</label>
+          <select id="login-role-hint" class="w-full rounded-lg border-slate-200 focus:border-pramuka-600 focus:ring-pramuka-600 px-4 py-2.5 text-sm bg-white">
+            <option value="">Deteksi otomatis dari akun</option>
+            <option value="SUPER_ADMIN">Super Admin</option>
+            <option value="PEMBINA">Pembina</option>
+            <option value="KERANI">Kerani</option>
+          </select>
+        </div>
+        <button onclick="doLogin()" class="w-full bg-pramuka-700 hover:bg-pramuka-800 text-white font-semibold py-2.5 rounded-lg transition shadow-lg shadow-pramuka-700/20">Masuk</button>
+        <p class="text-xs text-center text-slate-500">Gunakan data login di atas untuk mencoba hak akses berbeda.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP LAYOUT -->
+  <div id="app-layout" class="hidden min-h-screen flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 fixed h-full z-30 hidden md:flex flex-col">
+      <div class="h-16 flex items-center px-6 border-b border-slate-100 bg-gradient-to-r from-pramuka-800 to-pramuka-700 text-white">
+        <div class="font-bold text-sm leading-tight">
+          <div>Admin Portal Gudep</div>
+          <div class="text-[10px] opacity-90 font-normal uppercase tracking-wide">MAN 1 Padang Pariaman</div>
+        </div>
+      </div>
+      <nav class="flex-1 overflow-y-auto py-3">
+        <button onclick="navigate('dashboard')" id="nav-dashboard" class="sidebar-link w-full text-left px-6 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75h6.75v6.75H3.75V3.75zM13.5 3.75h6.75v6.75h-6.75V3.75zM13.5 13.5h6.75v6.75h-6.75V13.5zM3.75 13.5h6.75v6.75H3.75V13.5z"/></svg>
+          Beranda
+        </button>
+        <div class="mt-4 mb-2 px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Master Data</div>
+        <button onclick="navigate('periode')" id="nav-periode" class="sidebar-link w-full text-left px-6 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+          Periode Kepengurusan
+        </button>
+        <button onclick="navigate('jabatan')" id="nav-jabatan" class="sidebar-link w-full text-left px-6 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h7.5M9 10.5h7.5M9 14.25h7.5M9 18h7.5"/></svg>
+          Jabatan
+        </button>
+        <button onclick="navigate('pengurus')" id="nav-pengurus" class="sidebar-link w-full text-left px-6 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 20.25v-2.25A6.75 6.75 0 0111.25 11.25h1.5A6.75 6.75 0 0120 18v2.25"/></svg>
+          Pengurus Ambalan
+        </button>
+        <button onclick="navigate('anggota')" id="nav-anggota" class="sidebar-link w-full text-left px-6 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.964 0a9 9 0 10-11.964 0m11.964 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Anggota / Tingkatan
+        </button>
+        <div class="mt-4 mb-2 px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Operasional</div>
+        <button onclick="navigate('dokumen')" id="nav-dokumen" class="sidebar-link w-full text-left px-6 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 3v4.5h4.5M6.75 21h10.5A1.5 1.5 0 0018.75 19.5V7.5L14.25 3H6.75A1.5 1.5 0 005.25 4.5v15A1.5 1.5 0 006.75 21z"/></svg>
+          Dokumen & Surat
+        </button>
+        <button onclick="navigate('kegiatan')" id="nav-kegiatan" class="sidebar-link w-full text-left px-6 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+          Agenda Kegiatan
+        </button>
+        <div id="menu-users-container" class="hidden">
+          <div class="mt-4 mb-2 px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sistem</div>
+          <button onclick="navigate('users')" id="nav-users" class="sidebar-link w-full text-left px-6 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+ <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.25h15c.832 0 1.356-.668 1.199-1.413-.9-4.224-3.9-7.2-8.163-7.2-4.263 0-7.263 2.976-8.162 7.2-.157.745.367 1.413 1.2 1.413z"/></svg>
+            Pengguna
+          </button>
+        </div>
+      </nav>
+      <div class="border-t border-slate-100 p-4">
+        <button onclick="logout()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+          Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 md:ml-64 flex flex-col min-h-screen">
+      <!-- Topbar -->
+      <header class="h-16 bg-white/80 backdrop-blur border-b border-slate-200 sticky top-0 z-20 flex items-center justify-between px-6">
+        <div class="flex items-center gap-3">
+          <button onclick="toggleSidebarMobile()" class="md:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+          </button>
+          <div>
+            <h2 id="page-title" class="text-base font-semibold text-slate-800 leading-none">Beranda</h2>
+            <p id="page-subtitle" class="text-xs text-slate-500 mt-1">Ringkasan sistem Gudep 03-003 / 03-004</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="text-right hidden sm:block">
+            <div id="user-name" class="text-sm font-semibold text-slate-800 leading-none">Admin</div>
+            <div id="user-role" class="text-[10px] text-slate-500 mt-1 uppercase tracking-wide">Super Admin</div>
+          </div>
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-pramuka-600 to-pramuka-800 text-white flex items-center justify-center font-bold text-sm shadow-md" id="user-avatar">A</div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <main class="flex-1 p-6 overflow-x-hidden">
+        <!-- DASHBOARD -->
+        <section id="page-dashboard" class="page-section fade-in">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-xs text-slate-500 font-medium">Total Pengurus</div>
+                <div class="text-2xl font-bold text-slate-800" id="dash-pengurus">0</div>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372m-16.5-2.49a9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 13.5a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-xs text-slate-500 font-medium">Arsip Dokumen</div>
+                <div class="text-2xl font-bold text-slate-800" id="dash-dokumen">0</div>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg></div>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-xs text-slate-500 font-medium">Kegiatan Rencana</div>
+                <div class="text-2xl font-bold text-slate-800" id="dash-kegiatan">0</div>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg></div>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-xs text-slate-500 font-medium">Anggota Terdata</div>
+                <div class="text-2xl font-bold text-slate-800" id="dash-anggota">0</div>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.964 0a9 9 0 10-11.964 0m11.964 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+              <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-pramuka-600"></span> Identitas Gudep
+ </h3>
+              <div class="space-y-3 text-sm">
+                <div class="flex border-b border-slate-50 pb-2"><span class="w-32 text-slate-500">Pangkalan</span> <span class="font-medium text-slate-800">MAN 1 Padang Pariaman</span></div>
+                <div class="flex border-b border-slate-50 pb-2"><span class="w-32 text-slate-500">Alamat</span> <span class="font-medium text-slate-800">Jl. Padang-Bukittinggi KM 37, Kec. Sintuk Toboh Gadang, Kab. Padang Pariaman</span></div>
+                <div class="flex border-b border-slate-50 pb-2"><span class="w-32 text-slate-500">Gudep</span> <span class="font-medium text-slate-800">03-003 (Ambalan Ahmad Khatib — Putra) & 03-004 (Ambalan HR. Rasuna Said — Putri)</span></div>
+ <div class="flex border-b border-slate-50 pb-2"><span class="w-32 text-slate-500">KaMabigus</span> <span class="font-medium text-slate-800">Amrizon, S.Pd., M.Pd.I.</span></div>
+                <div class="flex border-b border-slate-50 pb-2"><span class="w-32 text-slate-500">Pembina Putra</span> <span class="font-medium text-slate-800">Fajrio, M.Pd.</span></div>
+                <div class="flex border-b border-slate-50 pb-2"><span class="w-32 text-slate-500">Pembina Putri</span> <span class="font-medium text-slate-800">Irdawati, S.H.I.</span></div>
+                <div class="flex"><span class="w-32 text-slate-500">Periode Aktif</span> <span class="font-medium text-pramuka-700" id="dash-periode-aktif">2025/2026</span></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+ <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span> Agenda Terdekat
+              </h3>
+              <div id="dashboard-agenda-list" class="space-y-3">
+                <!-- filled by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PERIODE -->
+        <section id="page-periode" class="page-section hidden-page">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="text-sm font-semibold text-slate-700">Data Periode Kepengurusan</div>
+              <button onclick="openModal('periode')" id="btn-add-periode" class="bg-pramuka-700 hover:bg-pramuka-800 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Tambah Periode</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm text-left">
+                <thead class="bg-slate-50 text-slate-600 font-semibold">
+                  <tr>
+ <th class="px-6 py-3">Nama Periode</th>
+                    <th class="px-6 py-3">Tahun Mulai</th>
+                    <th class="px-6 py-3">Tahun Selesai</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-periode" class="divide-y divide-slate-100 text-slate-700"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- JABATAN -->
+        <section id="page-jabatan" class="page-section hidden-page">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="text-sm font-semibold text-slate-700">Master Data Jabatan</div>
+              <button onclick="openModal('jabatan')" id="btn-add-jabatan" class="bg-pramuka-700 hover:bg-pramuka-800 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Tambah Jabatan</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm text-left">
+                <thead class="bg-slate-50 text-slate-600 font-semibold">
+                  <tr>
+                    <th class="px-6 py-3">Nama Jabatan</th>
+                    <th class="px-6 py-3">Kategori</th>
+                    <th class="px-6 py-3">Urutan</th>
+                    <th class="px-6 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-jabatan" class="divide-y divide-slate-100 text-slate-700"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- PENGURUS -->
+        <section id="page-pengurus" class="page-section hidden-page">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="text-sm font-semibold text-slate-700">Pengurus Ambalan</div>
+              <div class="flex gap-2">
+                <select id="filter-pengurus-periode" onchange="renderPengurus()" class="text-xs border-slate-200 rounded-lg px-3 py-2 bg-white text-slate-600">
+                  <option value="">Semua Periode</option>
+                </select>
+                <button onclick="openModal('pengurus')" id="btn-add-pengurus" class="bg-pramuka-700 hover:bg-pramuka-800 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Tambah Pengurus</button>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm text-left">
+                <thead class="bg-slate-50 text-slate-600 font-semibold">
+                  <tr>
+                    <th class="px-6 py-3">Nama</th>
+                    <th class="px-6 py-3">Jabatan</th>
+                    <th class="px-6 py-3">Periode</th>
+                    <th class="px-6 py-3">Gudep</th>
+                    <th class="px-6 py-3">Ambalan</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-pengurus" class="divide-y divide-slate-100 text-slate-700"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ANGGOTA -->
+        <section id="page-anggota" class="page-section hidden-page">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="text-sm font-semibold text-slate-700">Database Anggota / Tingkatan</div>
+              <button onclick="openModal('anggota')" id="btn-add-anggota" class="bg-pramuka-700 hover:bg-pramuka-800 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Tambah Anggota</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm text-left">
+                <thead class="bg-slate-50 text-slate-600 font-semibold">
+                  <tr>
+                    <th class="px-6 py-3">Nama</th>
+                    <th class="px-6 py-3">NISN</th>
+                    <th class="px-6 py-3">Gudep</th>
+                    <th class="px-6 py-3">Ambalan</th>
+                    <th class="px-6 py-3">Tingkatan</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-anggota" class="divide-y divide-slate-100 text-slate-700"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- DOKUMEN -->
+        <section id="page-dokumen" class="page-section hidden-page">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="text-sm font-semibold text-slate-700">Arsip Dokumen & Surat-Menyurat</div>
+              <button onclick="openModal('dokumen')" id="btn-add-dokumen" class="bg-pramuka-700 hover:bg-pramuka-800 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Tambah Dokumen</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm text-left">
+                <thead class="bg-slate-50 text-slate-600 font-semibold">
+                  <tr>
+                    <th class="px-6 py-3">Nomor Surat</th>
+                    <th class="px-6 py-3">Judul</th>
+                    <th class="px-6 py-3">Kategori</th>
+                    <th class="px-6 py-3">Tanggal</th>
+                    <th class="px-6 py-3">Publik</th>
+                    <th class="px-6 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-dokumen" class="divide-y divide-slate-100 text-slate-700"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- KEGIATAN -->
+        <section id="page-kegiatan" class="page-section hidden-page">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="text-sm font-semibold text-slate-700">Agenda Kegiatan & Latihan</div>
+              <button onclick="openModal('kegiatan')" id="btn-add-kegiatan" class="bg-pramuka-700 hover:bg-pramuka-800 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Tambah Kegiatan</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm text-left">
+                <thead class="bg-slate-50 text-slate-600 font-semibold">
+                  <tr>
+                    <th class="px-6 py-3">Nama</th>
+                    <th class="px-6 py-3">Jenis</th>
+                    <th class="px-6 py-3">Tanggal Mulai</th>
+                    <th class="px-6 py-3">Lokasi</th>
+                    <th class="px-6 py-3">Anggaran</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-kegiatan" class="divide-y divide-slate-100 text-slate-700"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- USERS -->
+        <section id="page-users" class="page-section hidden-page">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="text-sm font-semibold text-slate-700">Manajemen Pengguna (Akun Admin)</div>
+              <button onclick="openModal('users')" class="bg-pramuka-700 hover:bg-pramuka-800 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Tambah User</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm text-left">
+                <thead class="bg-slate-50 text-slate-600 font-semibold">
+                  <tr>
+                    <th class="px-6 py-3">Nama</th>
+                    <th class="px-6 py-3">Email</th>
+                    <th class="px-6 py-3">Peran</th>
+                    <th class="px-6 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-users" class="divide-y divide-slate-100 text-slate-700"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL CONTAINER -->
+  <div id="modal-overlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden flex items-center justify-center p-4">
+ <div id="modal-panel" class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto fade-in">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+ <h3 id="modal-title" class="text-base font-bold text-slate-800">Form</h3>
+        <button onclick="closeModal()" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div id="modal-body" class="p-5 space-y-4"></div>
+      <div class="p-5 border-t border-slate-100 flex justify-end gap-2 bg-slate-50">
+        <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-200">Batal</button>
+        <button onclick="saveModalForm()" class="px-4 py-2 rounded-lg text-sm font-medium bg-pramuka-700 hover:bg-pramuka-800 text-white">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+  <script>
+    // ================= DATABASE =================
+const DB = {
+  // Placeholder only — replaced with the real list (no passwords) from
+  // GET /users right after a successful login.
+  users: [
+    {id:1, nama_lengkap:'Super Admin', email:'admin@gudep.local', role:'SUPER_ADMIN'},
+    {id:2, nama_lengkap:'Pembina Putra', email:'pembina@gudep.local', role:'PEMBINA'},
+    {id:3, nama_lengkap:'Kerani Putra', email:'kerani@gudep.local', role:'KERANI'}
+  ],
+  // sisanya tetap sama
+    periode: [
+        {id:1, nama_periode:'2024/2025', tahun_mulai:2024, tahun_selesai:2025, is_active:false},
+        {id:2, nama_periode:'2025/2026', tahun_mulai:2025, tahun_selesai:2026, is_active:true}
+      ],
+      jabatan: [
+        {id:1, nama_jabatan:'KaMabigus', kategori:'MABIGUS', urutan:1},
+        {id:2, nama_jabatan:'Pembina Putra', kategori:'PEMBINA', urutan:2},
+        {id:3, nama_jabatan:'Pembina Putri', kategori:'PEMBINA', urutan:3},
+        {id:4, nama_jabatan:'Pradana Putra', kategori:'AMBALAN_PUTRA', urutan:4},
+        {id:5, nama_jabatan:'Pradana Putri', kategori:'AMBALAN_PUTRI', urutan:5},
+        {id:6, nama_jabatan:'Kerani Putra', kategori:'AMBALAN_PUTRA', urutan:6},
+        {id:7, nama_jabatan:'Kerani Putri', kategori:'AMBALAN_PUTRI', urutan:7},
+        {id:8, nama_jabatan:'Juru Uang', kategori:'SEKSI_BIDANG', urutan:8},
+        {id:9, nama_jabatan:'Pemangku Adat', kategori:'SEKSI_BIDANG', urutan:9},
+        {id:10, nama_jabatan:'Koordinator Tekpram', kategori:'SEKSI_BIDANG', urutan:10},
+        {id:11, nama_jabatan:'Koordinator Giatopp', kategori:'SEKSI_BIDANG', urutan:11},
+        {id:12, nama_jabatan:'Koordinator Abdimas', kategori:'SEKSI_BIDANG', urutan:12},
+        {id:13, nama_jabatan:'Koordinator Evabang', kategori:'SEKSI_BIDANG', urutan:13}
+      ],
+      pengurus: [
+        {id:1, periode_id:2, jabatan_id:1, nama_lengkap:'Amrizon, S.Pd., M.Pd.I.', nip_or_nisn:'19850101', gudep:'03-003/03-004', ambalan:'SEMUA', tingkatan:'PEMBINA', bidang:'NON_BIDANG', foto_url:'', status_aktif:true},
+        {id:2, periode_id:2, jabatan_id:2, nama_lengkap:'Fajrio, M.Pd.', nip_or_nisn:'19900215', gudep:'03-003', ambalan:'AHMAD_KHATIB', tingkatan:'PEMBINA', bidang:'NON_BIDANG', foto_url:'', status_aktif:true},
+        {id:3, periode_id:2, jabatan_id:3, nama_lengkap:'Irdawati, S.H.I.', nip_or_nisn:'19880920', gudep:'03-004', ambalan:'HR_RASUNA_SAID', tingkatan:'PEMBINA', bidang:'NON_BIDANG', foto_url:'', status_aktif:true},
+        {id:4, periode_id:2, jabatan_id:4, nama_lengkap:'Fadli Devandri', nip_or_nisn:'1234567890', gudep:'03-003', ambalan:'AHMAD_KHATIB', tingkatan:'LAKSANA', bidang:'NON_BIDANG', foto_url:'', status_aktif:true},
+        {id:5, periode_id:2, jabatan_id:6, nama_lengkap:'Muhammad Daffa Pratama', nip_or_nisn:'1234567891', gudep:'03-003', ambalan:'AHMAD_KHATIB', tingkatan:'LAKSANA', bidang:'NON_BIDANG', foto_url:'', status_aktif:true},
+        {id:6, periode_id:1, jabatan_id:1, nama_lengkap:'Amrizon, S.Pd., M.Pd.I.', nip_or_nisn:'19850101', gudep:'03-003/03-004', ambalan:'SEMUA', tingkatan:'PEMBINA', bidang:'NON_BIDANG', foto_url:'', status_aktif:false},
+        {id:7, periode_id:1, jabatan_id:2, nama_lengkap:'Abd. Malik, S.Hum.', nip_or_nisn:'19751220', gudep:'03-003', ambalan:'AHMAD_KHATIB', tingkatan:'PEMBINA', bidang:'NON_BIDANG', foto_url:'', status_aktif:false},
+        {id:8, periode_id:1, jabatan_id:3, nama_lengkap:'Mukhti Ayuni, S.Pd.', nip_or_nisn:'19921015', gudep:'03-004', ambalan:'HR_RASUNA_SAID', tingkatan:'PEMBINA', bidang:'NON_BIDANG', foto_url:'', status_aktif:false},
+        {id:9, periode_id:1, jabatan_id:4, nama_lengkap:'Rangga Asri Pratama', nip_or_nisn:'1098765432', gudep:'03-003', ambalan:'AHMAD_KHATIB', tingkatan:'LAKSANA', bidang:'NON_BIDANG', foto_url:'', status_aktif:false},
+        {id:10, periode_id:1, jabatan_id:6, nama_lengkap:'Ardi Fathir Rahman', nip_or_nisn:'1098765433', gudep:'03-003', ambalan:'AHMAD_KHATIB', tingkatan:'BANTARA', bidang:'NON_BIDANG', foto_url:'', status_aktif:false}
+      ],
+      dokumen_surat: [
+        {id:1, nomor_surat:'163GP/030503-MAN1PADPAR/2026', judul_dokumen:'Proposal GALAKSI IV', kategori:'PROPOSAL', tanggal_dokumen:'2026-03-15', tanggal_kegiatan:'2026-04-10', file_url:'#', deskripsi:'Proposal kegiatan GALAKSI IV', is_public:true, uploaded_by:1, created_at:'2026-01-10'}
+ ],
+      kegiatan_agenda: [
+        {id:1, nama_kegiatan:'Latihan Wajib Sabtu', jenis_kegiatan:'LATIHAN_WAJIB', tanggal_mulai:'2026-08-15T07:00:00', tanggal_selesai:'2026-08-15T10:00:00', lokasi:'MAN 1 Padang Pariaman', anggaran_biaya:0, status:'RENCANA', deskripsi:'Latihan rutin setiap sabtu'},
+        {id:2, nama_kegiatan:'Pelantikan Penegak Bantara & Laksana', jenis_kegiatan:'PELANTIKAN', tanggal_mulai:'2026-08-20T08:00:00', tanggal_selesai:'2026-08-20T12:00:00', lokasi:'Aula MAN 1 Padang Pariaman', anggaran_biaya:5000000, status:'RENCANA', deskripsi:'Pelantikan tingkatan'},
+        {id:3, nama_kegiatan:'Persami', jenis_kegiatan:'PERKEMAHAN', tanggal_mulai:'2026-09-01T06:00:00', tanggal_selesai:'2026-09-03T14:00:00', lokasi:'Fadhillah Camp', anggaran_biaya:15000000, status:'RENCANA', deskripsi:'Perkemahan Sabtu Minggu'},
+        {id:4, nama_kegiatan:'Kemah Wajib', jenis_kegiatan:'PERKEMAHAN', tanggal_mulai:'2026-10-10T06:00:00', tanggal_selesai:'2026-10-12T14:00:00', lokasi:'Bumi Perkemahan', anggaran_biaya:25000000, status:'RENCANA', deskripsi:'Kemah Wajib tahunan'}
+      ],
+      anggota: [
+        {id:1, nama:'Ahmad Fauzi', nisn:'0023456789', gudep:'03-003', ambalan:'AHMAD_KHATIB', tingkatan:'BANTARA', status:true},
+        {id:2, nama:'Putri Andini', nisn:'0023456790', gudep:'03-004', ambalan:'HR_RASUNA_SAID', tingkatan:'LAKSANA', status:true},
+        {id:3, nama:'Bayu Pratama', nisn:'0023456791', gudep:'03-003', ambalan:'AHMAD_KHATIB', tingkatan:'TAMU', status:true}
+      ]
+    };
+
+    // API layer that talks to json-server root endpoints (no /api/ prefix)
+    function apiRequest(resource, method='GET', id=null, body=null) {
+      const url = '/' + resource + (id ? '/' + id : '');
+      const opts = { method, headers: {'Content-Type':'application/json'} };
+      if (body) opts.body = JSON.stringify(body);
+      return fetch(url, opts).then(r => {
+        if (method === 'DELETE') return r.ok;
+        if (!r.ok) return Promise.reject(new Error('API error'));
+        return r.json();
+      });
+    }
+    const api = {
+      getUsers: () => apiRequest('users'),
+      getPeriode: () => apiRequest('periode'),
+      getJabatan: () => apiRequest('jabatan'),
+      getPengurus: () => apiRequest('pengurus'),
+      getAnggota: () => apiRequest('anggota'),
+      getDokumen: () => apiRequest('dokumen_surat'),
+      getKegiatan: () => apiRequest('kegiatan_agenda'),
+      post: (res, body) => apiRequest(res, 'POST', null, body),
+      put: (res, id, body) => apiRequest(res, 'PUT', id, body),
+      del: (res, id) => apiRequest(res, 'DELETE', id)
+    };
+
+    async function reloadAll() {
+      try {
+        const [users, periode, jabatan, pengurus, anggota, dokumen, kegiatan] = await Promise.all([
+          api.getUsers(), api.getPeriode(), api.getJabatan(), api.getPengurus(), api.getAnggota(), api.getDokumen(), api.getKegiatan()
+        ]);
+        DB.users = users || [];
+        DB.periode = periode || [];
+        DB.jabatan = jabatan || [];
+        DB.pengurus = pengurus || [];
+        DB.anggota = anggota || [];
+        DB.dokumen_surat = dokumen || [];
+        DB.kegiatan_agenda = kegiatan || [];
+      } catch (e) {
+        console.warn('reloadAll failed', e);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', ()=>{ reloadAll().catch(()=>{}); });
+
+
+    // ================= STATE =================
+    let currentUser = null;
+    let currentPage = 'dashboard';
+    let modalType = '';
+    let modalId = null;
+
+    // ================= HELPERS =================
+    const $ = (sel) => document.querySelector(sel);
+    const fmtDate = (d) => d ? new Date(d).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'}) : '-';
+    const fmtMoney = (n) => n ? 'Rp '+n.toLocaleString('id-ID') : '-';
+    const byId = (arr,id) => arr.find(x=>x.id==id);
+
+    function can(permission) {
+      if(!currentUser) return false;
+      if(currentUser.role==='SUPER_ADMIN') return true;
+      if(currentUser.role==='PEMBINA') {
+        return permission === 'view'; 
+ }
+      if(currentUser.role==='KERANI') {
+        return ['view','create','edit'].includes(permission);
+      }
+      return false;
+    }
+
+    function toast(msg, type='success') {
+      const el = document.createElement('div');
+      el.className = `pointer-events-auto px-4 py-3 rounded-lg shadow-xl text-white text-sm font-medium fade-in ${type==='success'?'bg-emerald-600':'bg-red-600'}`;
+      el.textContent = msg;
+      $('#toast-container').appendChild(el);
+      setTimeout(()=>{ el.style.opacity='0'; setTimeout(()=>el.remove(),300); }, 3000);
+    }
+
+    // ================= AUTH =================
+    // Known demo credentials, only used to pre-fill the real login call when
+    // the user picks a "Demo Peran" shortcut instead of typing email/password.
+    // Actual authentication always happens server-side via bcrypt in /api/login.
+    const DEMO_CREDENTIALS = {
+      SUPER_ADMIN: { email: 'admin@gudep.local', password: 'admin' },
+      PEMBINA: { email: 'pembina@gudep.local', password: 'pembina' },
+      KERANI: { email: 'kerani@gudep.local', password: 'kerani' }
+    };
+
+    async function doLogin() {
+      let email = $('#login-email').value.trim();
+      let pass = $('#login-password').value.trim();
+      const hint = $('#login-role-hint').value;
+
+      if (hint && !email && !pass) {
+        const demo = DEMO_CREDENTIALS[hint];
+        if (demo) { email = demo.email; pass = demo.password; }
+      }
+      if (!email || !pass) {
+        toast('Pilih Demo Peran atau masukkan email & kata sandi valid','error');
+        return;
+      }
+
+      const btn = document.querySelector('#login-screen button[onclick="doLogin()"]');
+      if (btn) { btn.disabled = true; btn.textContent = 'Memproses...'; }
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: pass })
+        });
+        const result = await res.json();
+        if (!res.ok || !result.ok) {
+          toast('Email atau kata sandi salah','error');
+          return;
+        }
+        // Fetch the full user list (server strips password hashes) so we get
+        // nama_lengkap and other profile fields alongside the session user.
+        const users = await api.getUsers();
+        DB.users = users || [];
+        const full = DB.users.find(x => x.id === result.user.id) || {};
+        const u = Object.assign({ nama_lengkap: result.user.email }, full, result.user);
+        u.role = (u.role || '').toUpperCase();
+
+        currentUser = u;
+        $('#login-screen').classList.add('hidden');
+        $('#app-layout').classList.remove('hidden');
+        $('#user-name').textContent = u.nama_lengkap;
+        $('#user-role').textContent = u.role==='SUPER_ADMIN'?'Super Admin':u.role==='PEMBINA'?'Pembina':'Kerani';
+        $('#user-avatar').textContent = (u.nama_lengkap||'?').charAt(0);
+        if(u.role!=='SUPER_ADMIN') $('#menu-users-container').classList.add('hidden');
+        else $('#menu-users-container').classList.remove('hidden');
+        // role-based button visibility
+        ['btn-add-periode','btn-add-jabatan','btn-add-pengurus','btn-add-dokumen','btn-add-kegiatan','btn-add-anggota'].forEach(id=>{
+          const b = document.getElementById(id);
+          if(b) b.style.display = can('create') ? 'inline-flex':'none';
+        });
+
+        setupSelectOptions();
+        navigate('dashboard');
+        toast(`Selamat datang, ${u.nama_lengkap}`);
+      } catch (e) {
+        console.error(e);
+        toast('Gagal terhubung ke server','error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Masuk'; }
+      }
+    }
+
+    async function logout() {
+      currentUser = null;
+      try { await fetch('/api/logout', { method: 'POST' }); } catch (e) { /* ignore */ }
+      location.reload();
+    }
+
+    // ================= ROUTER =================
+    function navigate(page) {
+      currentPage = page;
+      document.querySelectorAll('.page-section').forEach(el=>el.classList.add('hidden-page'));
+      document.getElementById('page-'+page).classList.remove('hidden-page');
+      document.querySelectorAll('.sidebar-link').forEach(el=>el.classList.remove('active'));
+      const nav = document.getElementById('nav-'+page);
+      if(nav) nav.classList.add('active');
+      
+      const titles = {
+        dashboard:['Beranda','Ringkasan sistem Gudep 03-003 / 03-004'],
+        periode:['Periode Kepengurusan','Kelola masa bakti pengurus'],
+        jabatan:['Jabatan','Master data jabatan organisasi'],
+        pengurus:['Pengurus Ambalan','Data personil pembina dan pengurus'],
+        anggota:['Anggota / Tingkatan','Database Penegak Tamu, Bantara, dan Laksana'],
+        dokumen:['Dokumen & Surat','Arsip digital proposal, LPJ, dan surat resmi'],
+        kegiatan:['Agenda Kegiatan','Kalender latihan dan kegiatan khusus'],
+        users:['Pengguna','Manajemen akun login admin']
+      };
+      $('#page-title').textContent = titles[page][0];
+      $('#page-subtitle').textContent = titles[page][1];
+      // Refresh data
+      if(page==='dashboard') renderDashboard();
+      if(page==='periode') renderPeriode();
+      if(page==='jabatan') renderJabatan();
+      if(page==='pengurus') { renderPengurusOptions(); renderPengurus(); }
+      if(page==='anggota') renderAnggota();
+      if(page==='dokumen') renderDokumen();
+      if(page==='kegiatan') renderKegiatan();
+      if(page==='users') renderUsers();
+    }
+
+    function setupSelectOptions() {
+      const sel = $('#filter-pengurus-periode');
+      if(!sel) return;
+      sel.innerHTML = '<option value="">Semua Periode</option>';
+      api.getPeriode().then(list=>{
+        list.forEach(p=>{
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = p.nama_periode;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    // ================= RENDERERS =================
+    function renderDashboard() {
+      Promise.all([api.getPengurus(), api.getDokumen(), api.getKegiatan(), api.getAnggota(), api.getPeriode()])
+        .then(([pengurus, dokumen, kegiatan, anggota, periode]) => {
+          $('#dash-pengurus').textContent = pengurus.length;
+          $('#dash-dokumen').textContent = dokumen.length;
+          $('#dash-kegiatan').textContent = kegiatan.filter(k=>k.status==='RENCANA'||k.status==='BERJALAN').length;
+          $('#dash-anggota').textContent = anggota.length;
+          const active = periode.find(p=>p.is_active);
+          $('#dash-periode-aktif').textContent = active?active.nama_periode:'-';
+          const agendaList = $('#dashboard-agenda-list');
+          agendaList.innerHTML = '';
+          const now = new Date();
+          const upcoming = kegiatan.filter(k=>new Date(k.tanggal_mulai)>=now).sort((a,b)=>new Date(a.tanggal_mulai)-new Date(b.tanggal_mulai)).slice(0,4);
+          if(upcoming.length===0) agendaList.innerHTML = '<div class="text-xs text-slate-400">Tidak ada agenda mendatang.</div>';
+          upcoming.forEach(k=>{
+        agendaList.insertAdjacentHTML('beforeend', `
+          <div class="flex items-start gap-3 border-b border-slate-50 pb-2 last:border-0">
+            <div class="w-10 h-10 rounded-lg bg-slate-50 text-slate-500 flex flex-col items-center justify-center text-[10px] leading-none font-bold uppercase">
+              <span>${new Date(k.tanggal_mulai).toLocaleDateString('id-ID',{month:'short'})}</span>
+              <span class="text-sm leading-none">${new Date(k.tanggal_mulai).getDate()}</span>
+            </div>
+            <div>
+              <div class="text-sm font-semibold text-slate-700 leading-snug">${k.nama_kegiatan}</div>
+              <div class="text-xs text-slate-500">${k.lokasi} • ${k.jenis_kegiatan.replace(/_/g,' ')}</div>
+            </div>
+          </div>
+        `);
+      });
+        });
+    }
+
+    function renderPeriode() {
+      const tb = $('#table-periode');
+      tb.innerHTML = '';
+      api.getPeriode().then(list=>{
+        list.forEach(p=>{
+          tb.insertAdjacentHTML('beforeend',`
+ <tr class="hover:bg-slate-50">
+            <td class="px-6 py-3 font-medium text-slate-800">${p.nama_periode}</td>
+            <td class="px-6 py-3">${p.tahun_mulai}</td>
+            <td class="px-6 py-3">${p.tahun_selesai}</td>
+            <td class="px-6 py-3">${p.is_active?'<span class="px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">AKTIF</span>':'<span class="px-2 py-1 rounded-md bg-slate-50 text-slate-500 text-xs border border-slate-100">Nonaktif</span>'}</td>
+            <td class="px-6 py-3 text-right">
+              ${can('edit')?`<button onclick="openModal('periode',${p.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium">Ubah</button>`:''}
+            </td>
+          </tr>
+        `);
+        });
+      });
+    }
+
+    function renderJabatan() {
+      const tb=$('#table-jabatan');
+      tb.innerHTML='';
+      api.getJabatan().then(list=>{
+        list.sort((a,b)=>a.urutan-b.urutan).forEach(j=>{
+          tb.insertAdjacentHTML('beforeend',`
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3 font-medium text-slate-800">${j.nama_jabatan}</td>
+              <td class="px-6 py-3 text-xs uppercase text-slate-500">${j.kategori.replace(/_/g,' ')}</td>
+              <td class="px-6 py-3">${j.urutan}</td>
+              <td class="px-6 py-3 text-right">
+                ${can('edit')?`<button onclick="openModal('jabatan',${j.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium mr-3">Ubah</button>`:''}
+                ${can('create')?`<button onclick="deleteJabatan(${j.id})" class="text-red-600 hover:text-red-800 text-xs font-medium">Hapus</button>`:''}
+              </td>
+            </tr>
+          `);
+        });
+      });
+    }
+
+    function renderPengurusOptions() {}
+
+    function renderPengurus() {
+      const tb=$('#table-pengurus');
+      tb.innerHTML='';
+      const filter = $('#filter-pengurus-periode').value;
+      api.getPengurus().then(list=>{
+        const rows = list.filter(p=> !filter || p.periode_id==filter);
+        rows.forEach(p=>{
+          const per = byId(DB.periode, p.periode_id);
+          const jab = byId(DB.jabatan, p.jabatan_id);
+          tb.insertAdjacentHTML('beforeend',`
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3">
+                <div class="font-medium text-slate-800">${p.nama_lengkap}</div>
+                <div class="text-[11px] text-slate-400">${p.nip_or_nisn||'-'}</div>
+              </td>
+              <td class="px-6 py-3 text-xs text-slate-600">${jab?jab.nama_jabatan:'-'}</td>
+              <td class="px-6 py-3 text-xs text-slate-600">${per?per.nama_periode:'-'}</td>
+              <td class="px-6 py-3 text-xs text-slate-600">${p.gudep}</td>
+              <td class="px-6 py-3 text-xs text-slate-600">${p.ambalan.replace(/_/g,' ')}</td>
+              <td class="px-6 py-3">${p.status_aktif?'<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-100">Aktif</span>':'<span class="px-2 py-0.5 rounded bg-slate-50 text-slate-500 text-[11px] border border-slate-100">Nonaktif</span>'}</td>
+              <td class="px-6 py-3 text-right">
+                ${can('edit')?`<button onclick="openModal('pengurus',${p.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium mr-3">Ubah</button>`:''}
+                ${can('create') && currentUser.role==='SUPER_ADMIN'?`<button onclick="deletePengurus(${p.id})" class="text-red-600 hover:text-red-800 text-xs font-medium">Hapus</button>`:''}
+              </td>
+            </tr>
+          `);
+        });
+      });
+    }
+
+    function renderAnggota() {
+      const tb=$('#table-anggota');
+      tb.innerHTML='';
+      api.getAnggota().then(list=>{
+        list.forEach(a=>{
+          tb.insertAdjacentHTML('beforeend',`
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3 font-medium text-slate-800">${a.nama}</td>
+              <td class="px-6 py-3 text-xs text-slate-500">${a.nisn}</td>
+              <td class="px-6 py-3 text-xs text-slate-600">${a.gudep}</td>
+              <td class="px-6 py-3 text-xs text-slate-600">${a.ambalan.replace(/_/g,' ')}</td>
+              <td class="px-6 py-3 text-xs uppercase font-bold text-slate-600">${a.tingkatan}</td>
+              <td class="px-6 py-3">${a.status?'<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-100">Aktif</span>':'<span class="px-2 py-0.5 rounded bg-slate-50 text-slate-500 text-[11px] border border-slate-100">Nonaktif</span>'}</td>
+              <td class="px-6 py-3 text-right">
+                ${can('edit')?`<button onclick="openModal('anggota',${a.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium mr-3">Ubah</button>`:''}
+                ${can('create')?`<button onclick="deleteAnggota(${a.id})" class="text-red-600 hover:text-red-800 text-xs font-medium">Hapus</button>`:''}
+              </td>
+            </tr>
+          `);
+        });
+      });
+    }
+
+    function renderDokumen() {
+      const tb=$('#table-dokumen');
+      tb.innerHTML='';
+      api.getDokumen().then(list=>{
+        list.forEach(d=>{
+          const u = byId(DB.users, d.uploaded_by);
+          tb.insertAdjacentHTML('beforeend',`
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3 font-mono text-xs text-slate-700">${d.nomor_surat||'-'}</td>
+              <td class="px-6 py-3">
+                <div class="font-medium text-slate-800 text-sm">${d.judul_dokumen}</div>
+                <div class="text-[11px] text-slate-400">${d.deskripsi||''}</div>
+              </td>
+              <td class="px-6 py-3 text-xs uppercase text-slate-600">${d.kategori.replace(/_/g,' ')}</td>
+              <td class="px-6 py-3 text-xs text-slate-600">${fmtDate(d.tanggal_dokumen)}</td>
+              <td class="px-6 py-3">${d.is_public?'<span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-[11px] font-bold border border-blue-100">Publik</span>':'<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[11px] border border-slate-200">Internal</span>'}</td>
+              <td class="px-6 py-3 text-right">
+                ${can('edit')?`<button onclick="openModal('dokumen',${d.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium mr-3">Ubah</button>`:''}
+                ${can('create')?`<button onclick="deleteDokumen(${d.id})" class="text-red-600 hover:text-red-800 text-xs font-medium">Hapus</button>`:''}
+              </td>
+            </tr>
+          `);
+        });
+      });
+    }
+
+    function renderKegiatan() {
+      const tb=$('#table-kegiatan');
+      tb.innerHTML='';
+      api.getKegiatan().then(list=>{
+        list.forEach(k=>{
+          const statusColor = k.status==='RENCANA'?'bg-slate-50 text-slate-600 border-slate-100':k.status==='BERJALAN'?'bg-blue-50 text-blue-700 border-blue-100':k.status==='SELESAI'?'bg-emerald-50 text-emerald-700 border-emerald-100':'bg-red-50 text-red-700 border-red-100';
+          tb.insertAdjacentHTML('beforeend',`
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3 font-medium text-slate-800 text-sm">${k.nama_kegiatan}</td>
+              <td class="px-6 py-3 text-xs text-slate-600 uppercase">${k.jenis_kegiatan.replace(/_/g,' ')}</td>
+              <td class="px-6 py-3 text-xs text-slate-600">${fmtDate(k.tanggal_mulai)}</td>
+              <td class="px-6 py-3 text-xs text-slate-600">${k.lokasi}</td>
+              <td class="px-6 py-3 text-xs text-slate-600">${fmtMoney(k.anggaran_biaya)}</td>
+              <td class="px-6 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-bold border ${statusColor}">${k.status}</span></td>
+              <td class="px-6 py-3 text-right">
+                ${can('edit')?`<button onclick="openModal('kegiatan',${k.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium mr-3">Ubah</button>`:''}
+                ${can('create')?`<button onclick="deleteKegiatan(${k.id})" class="text-red-600 hover:text-red-800 text-xs font-medium">Hapus</button>`:''}
+              </td>
+            </tr>
+          `);
+        });
+      });
+    }
+
+    function renderUsers() {
+      const tb=$('#table-users');
+      tb.innerHTML='';
+      api.getUsers().then(list=>{
+        list.forEach(u=>{
+          tb.insertAdjacentHTML('beforeend',`
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3 font-medium text-slate-800">${u.nama_lengkap}</td>
+              <td class="px-6 py-3 text-xs text-slate-500">${u.email}</td>
+              <td class="px-6 py-3 text-xs uppercase font-bold text-slate-600">${u.role.replace(/_/g,' ')}</td>
+              <td class="px-6 py-3 text-right">
+                <button onclick="openModal('users',${u.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium mr-3">Ubah</button>
+              </td>
+            </tr>
+          `);
+        });
+      });
+    }
+
+    // ================= MODAL / FORM =================
+    function openModal(type, id=null) {
+      modalType = type; modalId = id;
+      const title = $('#modal-title');
+      const body = $('#modal-body');
+      $('#modal-overlay').classList.remove('hidden');
+      body.innerHTML = '';
+      let html = '';
+
+      if(type==='periode') {
+        title.textContent = id ? 'Ubah Periode' : 'Tambah Periode';
+        const p = id ? byId(DB.periode, id) : {};
+        html = `
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nama Periode</label><input id="fm-nama_periode" class="w-full rounded-lg border-slate-200 text-sm" value="${p.nama_periode||''}"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tahun Mulai</label><input type="number" id="fm-tahun_mulai" class="w-full rounded-lg border-slate-200 text-sm" value="${p.tahun_mulai||''}"></div>
+            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tahun Selesai</label><input type="number" id="fm-tahun_selesai" class="w-full rounded-lg border-slate-200 text-sm" value="${p.tahun_selesai||''}"></div>
+          </div>
+          <div class="flex items-center gap-2 mt-1"><input type="checkbox" id="fm-is_active" ${p.is_active?'checked':''} class="rounded border-slate-300 text-pramuka-600 focus:ring-pramuka-600"><label for="fm-is_active" class="text-xs text-slate-600">Periode aktif saat ini</label></div>
+        `;
+      } else if(type==='jabatan') {
+        title.textContent = id ? 'Ubah Jabatan' : 'Tambah Jabatan';
+        const j = id ? byId(DB.jabatan, id) : {};
+        html = `
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nama Jabatan</label><input id="fm-nama_jabatan" class="w-full rounded-lg border-slate-200 text-sm" value="${j.nama_jabatan||''}"></div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori</label>
+            <select id="fm-kategori" class="w-full rounded-lg border-slate-200 text-sm">
+              <option ${j.kategori==='MABIGUS'?'selected':''}>MABIGUS</option>
+              <option ${j.kategori==='PEMBINA'?'selected':''}>PEMBINA</option>
+              <option ${j.kategori==='AMBALAN_PUTRA'?'selected':''}>AMBALAN_PUTRA</option>
+              <option ${j.kategori==='AMBALAN_PUTRI'?'selected':''}>AMBALAN_PUTRI</option>
+              <option ${j.kategori==='SEKSI_BIDANG'?'selected':''}>SEKSI_BIDANG</option>
+            </select>
+          </div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Urutan Tampil</label><input type="number" id="fm-urutan" class="w-full rounded-lg border-slate-200 text-sm" value="${j.urutan||''}"></div>
+        `;
+      } else if(type==='pengurus') {
+        title.textContent = id ? 'Ubah Pengurus' : 'Tambah Pengurus';
+        const p = id ? byId(DB.pengurus, id) : {};
+        const perOpts = DB.periode.map(x=>`<option value="${x.id}" ${p.periode_id==x.id?'selected':''}>${x.nama_periode}</option>`).join('');
+ const jabOpts = DB.jabatan.sort((a,b)=>a.urutan-b.urutan).map(x=>`<option value="${x.id}" ${p.jabatan_id==x.id?'selected':''}>${x.nama_jabatan}</option>`).join('');
+        html = `
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap</label><input id="fm-nama_lengkap" class="w-full rounded-lg border-slate-200 text-sm" value="${p.nama_lengkap||''}"></div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">NIP / NISN</label><input id="fm-nip" class="w-full rounded-lg border-slate-200 text-sm" value="${p.nip_or_nisn||''}"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Periode</label><select id="fm-periode_id" class="w-full rounded-lg border-slate-200 text-sm bg-white">${perOpts}</select></div>
+            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Jabatan</label><select id="fm-jabatan_id" class="w-full rounded-lg border-slate-200 text-sm bg-white">${jabOpts}</select></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Gudep</label>
+              <select id="fm-gudep" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+                <option ${p.gudep==='03-003'?'selected':''}>03-003</option>
+                <option ${p.gudep==='03-004'?'selected':''}>03-004</option>
+                <option ${p.gudep==='03-003/03-004'?'selected':''}>03-003/03-004</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Ambalan</label>
+              <select id="fm-ambalan" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+                <option ${p.ambalan==='AHMAD_KHATIB'?'selected':''}>AHMAD_KHATIB</option>
+                <option ${p.ambalan==='HR_RASUNA_SAID'?'selected':''}>HR_RASUNA_SAID</option>
+                <option ${p.ambalan==='SEMUA'?'selected':''}>SEMUA</option>
+              </select>
+ </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tingkatan</label>
+              <select id="fm-tingkatan" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+                <option ${p.tingkatan==='TAMU'?'selected':''}>TAMU</option>
+                <option ${p.tingkatan==='BANTARA'?'selected':''}>BANTARA</option>
+                <option ${p.tingkatan==='LAKSANA'?'selected':''}>LAKSANA</option>
+                <option ${p.tingkatan==='GARUDA'?'selected':''}>GARUDA</option>
+                <option ${p.tingkatan==='PEMBINA'?'selected':''}>PEMBINA</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Bidang</label>
+              <select id="fm-bidang" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+                <option ${p.bidang==='NON_BIDANG'?'selected':''}>NON_BIDANG</option>
+                <option ${p.bidang==='TEKPRAM'?'selected':''}>TEKPRAM</option>
+                <option ${p.bidang==='GIATOPP'?'selected':''}>GIATOPP</option>
+                <option ${p.bidang==='ABDIMAS'?'selected':''}>ABDIMAS</option>
+                <option ${p.bidang==='EVABANG'?'selected':''}>EVABANG</option>
+ </select>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mt-1"><input type="checkbox" id="fm-status_aktif" ${p.status_aktif?'checked':''} class="rounded border-slate-300 text-pramuka-600 focus:ring-pramuka-600"><label class="text-xs text-slate-600">Status aktif</label></div>
+        `;
+      } else if(type==='anggota') {
+        title.textContent = id ? 'Ubah Anggota' : 'Tambah Anggota';
+        const a = id ? byId(DB.anggota, id) : {};
+        html = `
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nama</label><input id="fm-nama" class="w-full rounded-lg border-slate-200 text-sm" value="${a.nama||''}"></div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">NISN</label><input id="fm-nisn" class="w-full rounded-lg border-slate-200 text-sm" value="${a.nisn||''}"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Gudep</label>
+              <select id="fm-gudep-a" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+                <option ${a.gudep==='03-003'?'selected':''}>03-003</option><option ${a.gudep==='03-004'?'selected':''}>03-004</option>
+              </select>
+            </div>
+            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Ambalan</label>
+              <select id="fm-ambalan-a" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+                <option ${a.ambalan==='AHMAD_KHATIB'?'selected':''}>AHMAD_KHATIB</option><option ${a.ambalan==='HR_RASUNA_SAID'?'selected':''}>HR_RASUNA_SAID</option>
+              </select>
+            </div>
+          </div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tingkatan</label>
+            <select id="fm-tingkatan-a" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+              <option ${a.tingkatan==='TAMU'?'selected':''}>TAMU</option><option ${a.tingkatan==='BANTARA'?'selected':''}>BANTARA</option><option ${a.tingkatan==='LAKSANA'?'selected':''}>LAKSANA</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2 mt-1"><input type="checkbox" id="fm-status-a" ${a.status?'checked':''} class="rounded border-slate-300 text-pramuka-600"><label class="text-xs text-slate-600">Aktif</label></div>
+        `;
+      } else if(type==='dokumen') {
+        title.textContent = id ? 'Ubah Dokumen' : 'Tambah Dokumen';
+        const d = id ? byId(DB.dokumen_surat, id) : {};
+        html = `
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Surat</label><input id="fm-nomor_surat" class="w-full rounded-lg border-slate-200 text-sm" value="${d.nomor_surat||''}" placeholder="163GP/030503-MAN1PADPAR/2026"></div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Judul Dokumen</label><input id="fm-judul_dokumen" class="w-full rounded-lg border-slate-200 text-sm" value="${d.judul_dokumen||''}"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Kategori</label>
+              <select id="fm-kategori-d" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+                <option ${d.kategori==='PROPOSAL'?'selected':''}>PROPOSAL</option><option ${d.kategori==='SURAT_PEMBERITAHUAN'?'selected':''}>SURAT_PEMBERITAHUAN</option>
+                <option ${d.kategori==='SURAT_IZIN'?'selected':''}>SURAT_IZIN</option><option ${d.kategori==='LPJ'?'selected':''}>LPJ</option>
+                <option ${d.kategori==='SK_PENETAPAN'?'selected':''}>SK_PENETAPAN</option><option ${d.kategori==='LAINNYA'?'selected':''}>LAINNYA</option>
+              </select>
+            </div>
+            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Dokumen</label><input type="date" id="fm-tanggal_dokumen" class="w-full rounded-lg border-slate-200 text-sm" value="${d.tanggal_dokumen||''}"></div>
+          </div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi</label><textarea id="fm-deskripsi-d" rows="3" class="w-full rounded-lg border-slate-200 text-sm">${d.deskripsi||''}</textarea></div>
+          <div class="flex items-center gap-2 mt-1"><input type="checkbox" id="fm-is_public" ${d.is_public?'checked':''} class="rounded border-slate-300 text-pramuka-600"><label class="text-xs text-slate-600">Publik (bisa diunduh pengunjung)</label></div>
+        `;
+      } else if(type==='kegiatan') {
+        title.textContent = id ? 'Ubah Kegiatan' : 'Tambah Kegiatan';
+        const k = id ? byId(DB.kegiatan_agenda, id) : {};
+        html = `
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nama Kegiatan</label><input id="fm-nama_kegiatan" class="w-full rounded-lg border-slate-200 text-sm" value="${k.nama_kegiatan||''}"></div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Jenis</label>
+ <select id="fm-jenis_kegiatan" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+              <option ${k.jenis_kegiatan==='LATIHAN_WAJIB'?'selected':''}>LATIHAN_WAJIB</option><option ${k.jenis_kegiatan==='PELANTIKAN'?'selected':''}>PELANTIKAN</option>
+              <option ${k.jenis_kegiatan==='PERKEMAHAN'?'selected':''}>PERKEMAHAN</option><option ${k.jenis_kegiatan==='LOMBA'?'selected':''}>LOMBA</option>
+              <option ${k.jenis_kegiatan==='RAPAT'?'selected':''}>RAPAT</option>
+ </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Mulai</label><input type="datetime-local" id="fm-tanggal_mulai" class="w-full rounded-lg border-slate-200 text-sm" value="${k.tanggal_mulai||''}"></div>
+            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Selesai</label><input type="datetime-local" id="fm-tanggal_selesai" class="w-full rounded-lg border-slate-200 text-sm" value="${k.tanggal_selesai||''}"></div>
+          </div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Lokasi</label><input id="fm-lokasi" class="w-full rounded-lg border-slate-200 text-sm" value="${k.lokasi||''}"></div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Anggaran Biaya (Rp)</label><input type="number" id="fm-anggaran_biaya" class="w-full rounded-lg border-slate-200 text-sm" value="${k.anggaran_biaya||''}"></div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Status</label>
+ <select id="fm-status-k" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+              <option ${k.status==='RENCANA'?'selected':''}>RENCANA</option><option ${k.status==='BERJALAN'?'selected':''}>BERJALAN</option>
+              <option ${k.status==='SELESAI'?'selected':''}>SELESAI</option><option ${k.status==='DIBATALKAN'?'selected':''}>DIBATALKAN</option>
+            </select>
+          </div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi</label><textarea id="fm-deskripsi-k" rows="2" class="w-full rounded-lg border-slate-200 text-sm">${k.deskripsi||''}</textarea></div>
+        `;
+      } else if(type==='users') {
+        title.textContent = id ? 'Ubah Pengguna' : 'Tambah Pengguna';
+        const u = id ? byId(DB.users, id) : {};
+        html = `
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap</label><input id="fm-nama-user" class="w-full rounded-lg border-slate-200 text-sm" value="${u.nama_lengkap||''}"></div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Email</label><input id="fm-email-user" class="w-full rounded-lg border-slate-200 text-sm" value="${u.email||''}"></div>
+          <div><label class="block text-xs font-semibold text-slate-700 mb-1">Peran</label>
+ <select id="fm-role-user" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+              <option ${u.role==='SUPER_ADMIN'?'selected':''}>SUPER_ADMIN</option>
+              <option ${u.role==='PEMBINA'?'selected':''}>PEMBINA</option>
+              <option ${u.role==='KERANI'?'selected':''}>KERANI</option>
+            </select>
+          </div>
+          ${!id?'<div><label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi</label><input type="password" id="fm-password-user" class="w-full rounded-lg border-slate-200 text-sm" value=""></div>':''}
+        `;
+      }
+      body.innerHTML = html;
+    }
+
+    function closeModal() {
+      $('#modal-overlay').classList.add('hidden');
+      modalType=''; modalId=null;
+    }
+
+    async function saveModalForm() {
+      if(!can('edit') && !can('create')) { toast('Anda tidak memiliki izin.','error'); return; }
+      const get = (id) => { const el=$(id); return el?el.value:''; };
+      const getCheck = (id) => { const el=$(id); return el?el.checked:false; };
+
+      try {
+        if(modalType==='periode') {
+          const nama = get('#fm-nama_periode').trim();
+          const mulai = parseInt(get('#fm-tahun_mulai'));
+          const selesai = parseInt(get('#fm-tahun_selesai'));
+          if(!nama||!mulai||!selesai) { toast('Lengkapi data wajib.','error'); return; }
+          const payload = { nama_periode:nama, tahun_mulai:mulai, tahun_selesai:selesai, is_active:getCheck('#fm-is_active') };
+          if(modalId) await api.put('periode', modalId, payload); else await api.post('periode', payload);
+        } else if(modalType==='jabatan') {
+          const nama = get('#fm-nama_jabatan').trim();
+          const kat = get('#fm-kategori');
+          const urut = parseInt(get('#fm-urutan'))||0;
+          if(!nama) return;
+          const payload = { nama_jabatan:nama, kategori:kat, urutan:urut };
+          if(modalId) await api.put('jabatan', modalId, payload); else await api.post('jabatan', payload);
+        } else if(modalType==='pengurus') {
+          const nama = get('#fm-nama_lengkap').trim(); if(!nama) return;
+          const payload = {
+            nama_lengkap: nama,
+            nip_or_nisn: get('#fm-nip'),
+            periode_id: parseInt(get('#fm-periode_id')),
+            jabatan_id: parseInt(get('#fm-jabatan_id')),
+            gudep: get('#fm-gudep'),
+            ambalan: get('#fm-ambalan'),
+            tingkatan: get('#fm-tingkatan'),
+            bidang: get('#fm-bidang'),
+            status_aktif: getCheck('#fm-status_aktif')
+          };
+          if(modalId) await api.put('pengurus', modalId, payload); else await api.post('pengurus', payload);
+        } else if(modalType==='anggota') {
+          const nama = get('#fm-nama').trim(); if(!nama) return;
+          const payload = { nama, nisn: get('#fm-nisn'), gudep: get('#fm-gudep-a'), ambalan: get('#fm-ambalan-a'), tingkatan: get('#fm-tingkatan-a'), status: getCheck('#fm-status-a') };
+          if(modalId) await api.put('anggota', modalId, payload); else await api.post('anggota', payload);
+        } else if(modalType==='dokumen') {
+          const judul = get('#fm-judul_dokumen').trim(); if(!judul) return;
+          const payload = {
+            nomor_surat: get('#fm-nomor_surat'),
+            judul_dokumen: judul,
+            kategori: get('#fm-kategori-d'),
+            tanggal_dokumen: get('#fm-tanggal_dokumen'),
+            deskripsi: get('#fm-deskripsi-d'),
+            is_public: getCheck('#fm-is_public'),
+            tanggal_kegiatan: null,
+            file_url: '#',
+            uploaded_by: currentUser?currentUser.id:null,
+            created_at: new Date().toISOString().slice(0,10)
+          };
+          if(modalId) await api.put('dokumen_surat', modalId, payload); else await api.post('dokumen_surat', payload);
+        } else if(modalType==='kegiatan') {
+          const nama = get('#fm-nama_kegiatan').trim(); if(!nama) return;
+          const payload = {
+            nama_kegiatan: nama,
+            jenis_kegiatan: get('#fm-jenis_kegiatan'),
+            tanggal_mulai: get('#fm-tanggal_mulai'),
+            tanggal_selesai: get('#fm-tanggal_selesai'),
+            lokasi: get('#fm-lokasi'),
+            anggaran_biaya: parseInt(get('#fm-anggaran_biaya'))||0,
+            status: get('#fm-status-k'),
+            deskripsi: get('#fm-deskripsi-k')
+          };
+          if(modalId) await api.put('kegiatan_agenda', modalId, payload); else await api.post('kegiatan_agenda', payload);
+        } else if(modalType==='users') {
+          const nama = get('#fm-nama-user').trim();
+          const email = get('#fm-email-user').trim();
+          const role = get('#fm-role-user');
+          if(!nama||!email) return;
+          const payload = { nama_lengkap:nama, email, role };
+          if(modalId) await api.put('users', modalId, payload); else await api.post('users', payload);
+        }
+        closeModal();
+        await reloadAll();
+        navigate(currentPage);
+        toast('Data berhasil disimpan');
+      } catch (e) {
+        console.error(e); toast('Gagal menyimpan data','error');
+      }
+    }
+
+    async function deleteJabatan(id){
+      if(!confirm('Hapus Jabatan ini?')) return; try { await api.del('jabatan', id); await reloadAll(); navigate(currentPage); toast('Jabatan dihapus'); } catch(e){ console.error(e); toast('Gagal menghapus Jabatan','error'); }
+    }
+    async function deletePengurus(id){
+      if(currentUser.role!=='SUPER_ADMIN'){toast('Hanya Super Admin yang dapat menghapus data pengurus.','error');return;} if(!confirm('Hapus Pengurus ini?')) return; try { await api.del('pengurus', id); await reloadAll(); navigate(currentPage); toast('Pengurus dihapus'); } catch(e){ console.error(e); toast('Gagal menghapus Pengurus','error'); }
+    }
+    async function deleteAnggota(id){ if(!confirm('Hapus Anggota ini?')) return; try { await api.del('anggota', id); await reloadAll(); navigate(currentPage); toast('Anggota dihapus'); } catch(e){ console.error(e); toast('Gagal menghapus Anggota','error'); } }
+    async function deleteDokumen(id){ if(!confirm('Hapus Dokumen ini?')) return; try { await api.del('dokumen_surat', id); await reloadAll(); navigate(currentPage); toast('Dokumen dihapus'); } catch(e){ console.error(e); toast('Gagal menghapus Dokumen','error'); } }
+    async function deleteKegiatan(id){ if(!confirm('Hapus Kegiatan ini?')) return; try { await api.del('kegiatan_agenda', id); await reloadAll(); navigate(currentPage); toast('Kegiatan dihapus'); } catch(e){ console.error(e); toast('Gagal menghapus Kegiatan','error'); } }
+
+    function toggleSidebarMobile() {
+ document.getElementById('sidebar').classList.toggle('hidden');
+      document.getElementById('sidebar').classList.toggle('flex');
+      document.getElementById('sidebar').classList.toggle('fixed');
+      document.getElementById('sidebar').classList.toggle('h-full');
+    }
+  </script>
+</body>
+</html>

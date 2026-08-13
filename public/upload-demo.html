@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Upload - POC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";padding:24px;background:#f6f8fb}
+    .card{background:#fff;padding:20px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.06);max-width:920px;margin:auto}
+    .btn{background:#2563eb;color:#fff;padding:10px 14px;border-radius:6px;border:none;cursor:pointer}
+    .progress{height:18px;background:#e6eefc;border-radius:9px;overflow:hidden;margin-top:10px}
+    .bar{height:100%;background:#60a5fa;width:0}
+    pre{background:#0b1220;color:#9ae6b4;padding:12px;border-radius:6px;overflow:auto}
+    .hint{color:#555}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Upload Data (POC)</h2>
+    <p class="hint">Pilih file CSV (template tersedia). Preview 10 baris sebelum upload.</p>
+
+    <div style="display:flex;align-items:center;gap:8px">
+      <label class="btn">Pilih File
+        <input id="file" type="file" accept=".csv" style="display:none" />
+      </label>
+      <button id="uploadBtn" class="btn">Upload</button>
+      <button id="showJobs" class="btn" style="background:#10b981">Job Status</button>
+      <button id="showUsers" class="btn" style="background:#7c3aed;margin-left:auto">Users</button>
+    </div>
+
+    <div id="previewSection" style="margin-top:16px; display:none">
+      <h4>Preview (maks 10 baris)</h4>
+      <pre id="preview"></pre>
+    </div>
+
+    <div id="progressWrap" style="margin-top:12px;display:none">
+      <div class="progress"><div id="bar" class="bar"></div></div>
+      <div id="status" style="margin-top:8px"></div>
+    </div>
+
+    <div id="result" style="margin-top:14px"></div>
+
+    <div id="loginPanel" style="margin-top:18px">
+      <h4>Admin — Login / Register</h4>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="email" type="email" placeholder="email@example.com" style="padding:8px;border-radius:6px;border:1px solid #ddd;width:220px" />
+        <input id="password" type="password" placeholder="Password" style="padding:8px;border-radius:6px;border:1px solid #ddd;width:180px" />
+        <button id="loginBtn" class="btn">Login</button>
+        <button id="registerBtn" class="btn" style="background:#f59e0b">Register</button>
+        <button id="logoutBtn" class="btn" style="margin-left:8px;background:#ef4444;display:none">Logout</button>
+      </div>
+      <div style="margin-top:8px">
+        <a href="/template.csv" download class="btn" style="background:#06b6d4">Download Template</a>
+        <span style="margin-left:12px;color:#666">Contoh file CSV untuk diisi</span>
+      </div>
+      <div id="message" style="margin-top:10px"></div>
+    </div>
+
+    <div id="jobsPanel" style="margin-top:18px;display:none">
+      <h4>Jobs</h4>
+      <button id="refreshJobs" class="btn" style="background:#06b6d4">Refresh</button>
+      <div id="jobsList" style="margin-top:12px"></div>
+    </div>
+
+    <div id="usersPanel" style="margin-top:18px;display:none">
+      <h4>Users</h4>
+      <button id="refreshUsers" class="btn" style="background:#8b5cf6">Refresh Users</button>
+      <div id="usersList" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+<script>
+const fileInput = document.getElementById('file');
+const preview = document.getElementById('preview');
+const previewSection = document.getElementById('previewSection');
+const uploadBtn = document.getElementById('uploadBtn');
+const bar = document.getElementById('bar');
+const progressWrap = document.getElementById('progressWrap');
+const status = document.getElementById('status');
+const result = document.getElementById('result');
+let selectedFile = null;
+
+fileInput.addEventListener('change', () => {
+  selectedFile = fileInput.files[0];
+  if (!selectedFile) return;
+  // quick preview: read first chunk and parse lines
+  const reader = new FileReader();
+  reader.onload = () => {
+    const text = reader.result;
+    const lines = text.split(/\r?\n/).slice(0, 12).join('\n');
+    preview.textContent = lines;
+    previewSection.style.display = 'block';
+  };
+  reader.readAsText(selectedFile.slice(0, 64*1024)); // read first 64KB
+});
+
+uploadBtn.addEventListener('click', () => {
+  if (!selectedFile) { alert('Pilih file terlebih dahulu'); return; }
+  uploadFile(selectedFile);
+});
+
+function uploadFile(file) {
+  const xhr = new XMLHttpRequest();
+  const fd = new FormData();
+  fd.append('file', file);
+  xhr.open('POST', '/api/upload', true);
+  xhr.withCredentials = true;
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) {
+      const pct = Math.round((e.loaded / e.total) * 100);
+      bar.style.width = pct + '%';
+      progressWrap.style.display = 'block';
+      status.textContent = pct + '% uploaded';
+    }
+  };
+  xhr.onreadystatechange = () => {
+    if (xhr.readyState === 4) {
+      progressWrap.style.display = 'none';
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const json = JSON.parse(xhr.responseText);
+        result.innerHTML = '<strong>Upload sukses</strong><pre>' + JSON.stringify(json, null, 2) + '</pre>';
+      } else {
+        result.innerHTML = '<strong style="color:red">Upload gagal</strong><pre>' + xhr.responseText + '</pre>';
+      }
+    }
+  };
+  xhr.send(fd);
+}
+
+// Auth & Jobs UI
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const registerBtn = document.getElementById('registerBtn');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const showJobs = document.getElementById('showJobs');
+const jobsPanel = document.getElementById('jobsPanel');
+const jobsList = document.getElementById('jobsList');
+const refreshJobs = document.getElementById('refreshJobs');
+const message = document.getElementById('message');
+
+function showMessage(text, ok=true) {
+  message.innerHTML = `<div style="padding:8px;border-radius:6px;color:${ok? '#064e3b':'#7f1d1d'};background:${ok? '#bbf7d0':'#fecaca'}">${text}</div>`;
+  setTimeout(() => { message.innerHTML = ''; }, 5000);
+}
+
+async function updateUIAfterAuth() {
+  loginBtn.style.display = 'none';
+  registerBtn.style.display = 'none';
+  logoutBtn.style.display = 'inline-block';
+  jobsPanel.style.display = 'block';
+}
+
+loginBtn.addEventListener('click', async () => {
+  const email = emailInput.value;
+  const pw = passwordInput.value;
+  if (!email || !pw) { showMessage('Email & password wajib', false); return; }
+  try {
+    const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ email, password: pw }) });
+    if (res.ok) { showMessage('Login sukses'); await updateUIAfterAuth(); fetchJobs(); }
+    else { const err = await res.json().catch(()=>({})); showMessage(err.error || 'Login gagal', false); }
+  } catch (err) {
+    showMessage('Gagal menghubungi server', false);
+    console.error('Login error', err);
+  }
+});
+
+registerBtn.addEventListener('click', async () => {
+  const email = emailInput.value;
+  const pw = passwordInput.value;
+  if (!email || !pw) { showMessage('Email & password wajib', false); return; }
+  try {
+    const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ email, password: pw }) });
+    if (res.ok) { showMessage('Register sukses — Anda langsung login'); await updateUIAfterAuth(); fetchJobs(); }
+    else { const txt = await res.json().catch(()=>({error:'Register gagal'})); showMessage(txt.error || 'Register gagal', false); }
+  } catch (err) {
+    showMessage('Gagal menghubungi server', false);
+    console.error('Register error', err);
+  }
+});
+
+logoutBtn.addEventListener('click', async () => {
+  await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+  loginBtn.style.display='inline-block'; registerBtn.style.display='inline-block'; logoutBtn.style.display='none'; jobsPanel.style.display='none';
+  showMessage('Logout');
+});
+
+showJobs.addEventListener('click', () => {
+  jobsPanel.style.display = jobsPanel.style.display === 'none' ? 'block' : 'none';
+});
+
+refreshJobs.addEventListener('click', fetchJobs);
+
+const showUsersBtn = document.getElementById('showUsers');
+const usersPanel = document.getElementById('usersPanel');
+const usersList = document.getElementById('usersList');
+const refreshUsers = document.getElementById('refreshUsers');
+
+showUsersBtn.addEventListener('click', () => { usersPanel.style.display = usersPanel.style.display === 'none' ? 'block' : 'none'; });
+refreshUsers.addEventListener('click', fetchUsers);
+
+async function fetchJobs() {
+  jobsList.textContent = 'Loading...';
+  try {
+    const res = await fetch('/api/jobs', { credentials: 'include' });
+    if (!res.ok) { jobsList.innerHTML = '<span style="color:red">Unauthorized or error</span>'; return; }
+    const data = await res.json();
+    if (!data.jobs || data.jobs.length === 0) { jobsList.innerHTML = '<em>No jobs</em>'; return; }
+    jobsList.innerHTML = '';
+    data.jobs.forEach(j => {
+      const el = document.createElement('div');
+      el.style.padding='8px'; el.style.borderTop='1px solid #eee';
+      el.innerHTML = `<strong>${j.id}</strong> [${j.name}] <span class="ml-2 text-sm">state:${j.state} processedOn:${j.processedOn || '-'} failed:${j.failedReason || '-'}</span><br/><small>data: ${JSON.stringify(j.data)}</small>`;
+      const retry = document.createElement('button');
+      retry.className='btn'; retry.style.background='#f59e0b'; retry.textContent='Retry';
+      retry.onclick = async () => { await fetch('/api/jobs/'+encodeURIComponent(j.id)+'/retry', { method:'POST' }); showMessage('Retry enqueued'); };
+      el.appendChild(retry);
+      jobsList.appendChild(el);
+    });
+  } catch (err) {
+    jobsList.innerHTML = '<span style="color:red">Gagal menghubungi server</span>';
+    console.error('fetchJobs error', err);
+  }
+}
+
+async function fetchUsers() {
+  usersList.textContent = 'Loading...';
+  try {
+    const res = await fetch('/api/users', { credentials: 'include' });
+    if (!res.ok) { usersList.innerHTML = '<span style="color:red">Unauthorized or error</span>'; return; }
+    const data = await res.json();
+    if (!data.users || data.users.length === 0) { usersList.innerHTML = '<em>No users</em>'; return; }
+    usersList.innerHTML = '';
+    data.users.forEach(u => {
+      const el = document.createElement('div');
+      el.style.padding='8px'; el.style.borderTop='1px solid #eee';
+      el.innerHTML = `<strong>${u.email}</strong> <span class="ml-2 text-sm text-gray-600">created:${u.createdAt}</span>`;
+      const resetBtn = document.createElement('button');
+      resetBtn.className='btn'; resetBtn.style.background='#ef4444'; resetBtn.textContent='Reset PW';
+      resetBtn.onclick = async () => {
+        const np = prompt('New password for ' + u.email);
+        if (!np) return;
+        const r = await fetch('/api/users/'+encodeURIComponent(u.id)+'/reset-password', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: np }) });
+        if (r.ok) showMessage('Password reset'); else showMessage('Reset failed', false);
+      };
+      el.appendChild(resetBtn);
+      usersList.appendChild(el);
+    });
+  } catch (err) {
+    usersList.innerHTML = '<span style="color:red">Gagal menghubungi server</span>';
+    console.error('fetchUsers error', err);
+  }
+}
+</script>
+</body>
+</html>
